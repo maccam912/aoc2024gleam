@@ -1,7 +1,7 @@
-import gleam/io
-import gleam/int
 import day01
 import day02
+import gleam/int
+import gleam/io
 import utils
 
 pub fn main() {

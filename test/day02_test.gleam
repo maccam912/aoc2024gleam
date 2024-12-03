@@ -1,6 +1,6 @@
+import day02
 import gleeunit
 import gleeunit/should
-import day02
 
 pub fn main() {
   gleeunit.main()

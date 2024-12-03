@@ -1,7 +1,7 @@
-import gleam/string
-import gleam/list
 import gleam/int
+import gleam/list
 import gleam/result
+import gleam/string
 
 pub fn parse_input(input: String) -> List(List(Int)) {
   input
@@ -10,9 +10,7 @@ pub fn parse_input(input: String) -> List(List(Int)) {
   |> list.map(fn(line) {
     line
     |> string.split(" ")
-    |> list.map(fn(n) {
-      result.unwrap(int.parse(n), 0)
-    })
+    |> list.map(fn(n) { result.unwrap(int.parse(n), 0) })
   })
 }
 
@@ -25,16 +23,14 @@ fn is_monotonic(numbers: List(Int)) -> Bool {
   case numbers {
     [] | [_] -> True
     [_first, ..] -> {
-      let all_increasing = list.fold(
-        list.window_by_2(numbers),
-        True,
-        fn(acc, pair) { acc && pair.0 < pair.1 },
-      )
-      let all_decreasing = list.fold(
-        list.window_by_2(numbers),
-        True,
-        fn(acc, pair) { acc && pair.0 > pair.1 },
-      )
+      let all_increasing =
+        list.fold(list.window_by_2(numbers), True, fn(acc, pair) {
+          acc && pair.0 < pair.1
+        })
+      let all_decreasing =
+        list.fold(list.window_by_2(numbers), True, fn(acc, pair) {
+          acc && pair.0 > pair.1
+        })
       all_increasing || all_decreasing
     }
   }
@@ -44,11 +40,9 @@ fn is_valid_differences(numbers: List(Int)) -> Bool {
   case numbers {
     [] | [_] -> True
     [_first, ..] -> {
-      list.fold(
-        list.window_by_2(numbers),
-        True,
-        fn(acc, pair) { acc && is_valid_difference(pair.0, pair.1) },
-      )
+      list.fold(list.window_by_2(numbers), True, fn(acc, pair) {
+        acc && is_valid_difference(pair.0, pair.1)
+      })
     }
   }
 }

@@ -1,6 +1,6 @@
+import day01.{Input}
 import gleeunit
 import gleeunit/should
-import day01.{Input}
 
 pub fn main() {
   gleeunit.main()
