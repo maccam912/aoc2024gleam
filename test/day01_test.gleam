@@ -7,12 +7,12 @@ pub fn main() {
 }
 
 pub fn example_input() {
-  "3\t4
-4\t3
-2\t5
-1\t3
-3\t9
-3\t3"
+  "3 4
+4 3
+2 5
+1 3
+3 9
+3 3"
 }
 
 pub fn parse_test() {
