@@ -82,7 +82,3 @@ Day2 = :day02.parse_input(Input2)
 - [x] Day 2: Red-Nosed Reports
   - [x] Part 1
   - [x] Part 2
-
-## License
-
-This project is released under the MIT License. See the LICENSE file for details.
