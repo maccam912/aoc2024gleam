@@ -1,5 +1,6 @@
 import day01
 import day02
+import day03
 import gleam/int
 import gleam/io
 import utils
@@ -27,5 +28,15 @@ pub fn main() {
       io.println("Part 2: " <> int.to_string(day02.part2(parsed)))
     }
     Error(e) -> io.println("\nDay 2: " <> e)
+  }
+
+  // Run Day 3
+  case utils.read_input(3) {
+    Ok(input) -> {
+      io.println("\nDay 3:")
+      io.println("Part 1: " <> day03.part1(input) |> int.to_string)
+      io.println("Part 2: " <> day03.part2(input) |> int.to_string)
+    }
+    Error(e) -> io.println("\nDay 3: " <> e)
   }
 }
