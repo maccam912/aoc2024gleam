@@ -1,8 +1,9 @@
-import gleam/io
-import gleam/int
-import simplifile
 import day01
 import day02
+import day03
+import gleam/int
+import gleam/io
+import simplifile
 import utils
 
 pub fn main() {
@@ -28,5 +29,16 @@ pub fn main() {
       io.println("")
     }
     Error(e) -> io.println("Day 2: " <> e)
+  }
+
+  // Run Day 3
+  case utils.read_input(3) {
+    Ok(input) -> {
+      io.println("Day 3:")
+      io.println("Part 1: " <> int.to_string(day03.part1(input)))
+      io.println("Part 2: " <> int.to_string(day03.part2(input)))
+      io.println("")
+    }
+    Error(e) -> io.println("Day 3: " <> e)
   }
 }
