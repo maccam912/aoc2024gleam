@@ -1,8 +1,8 @@
+import gleam/io
+import gleam/int
+import simplifile
 import day01
 import day02
-import day03
-import gleam/int
-import gleam/io
 import utils
 
 pub fn main() {
@@ -11,10 +11,10 @@ pub fn main() {
   // Run Day 1
   case utils.read_input(1) {
     Ok(input) -> {
-      let parsed = day01.parse_input(input)
       io.println("Day 1:")
-      io.println("Part 1: " <> int.to_string(day01.part1(parsed)))
-      io.println("Part 2: " <> int.to_string(day01.part2(parsed)))
+      io.println("Part 1: " <> int.to_string(day01.part1(input)))
+      io.println("Part 2: " <> int.to_string(day01.part2(input)))
+      io.println("")
     }
     Error(e) -> io.println("Day 1: " <> e)
   }
@@ -22,21 +22,11 @@ pub fn main() {
   // Run Day 2
   case utils.read_input(2) {
     Ok(input) -> {
-      let parsed = day02.parse_input(input)
-      io.println("\nDay 2:")
-      io.println("Part 1: " <> int.to_string(day02.part1(parsed)))
-      io.println("Part 2: " <> int.to_string(day02.part2(parsed)))
+      io.println("Day 2:")
+      io.println("Part 1: " <> int.to_string(day02.part1(input)))
+      io.println("Part 2: " <> int.to_string(day02.part2(input)))
+      io.println("")
     }
-    Error(e) -> io.println("\nDay 2: " <> e)
-  }
-
-  // Run Day 3
-  case utils.read_input(3) {
-    Ok(input) -> {
-      io.println("\nDay 3:")
-      io.println("Part 1: " <> day03.part1(input) |> int.to_string)
-      io.println("Part 2: " <> day03.part2(input) |> int.to_string)
-    }
-    Error(e) -> io.println("\nDay 3: " <> e)
+    Error(e) -> io.println("Day 2: " <> e)
   }
 }

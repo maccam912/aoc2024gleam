@@ -1,36 +1,21 @@
-import day01.{Input}
 import gleeunit
 import gleeunit/should
+import day01
 
 pub fn main() {
   gleeunit.main()
 }
 
-pub fn example_input() {
-  "3 4
-4 3
-2 5
-1 3
-3 9
-3 3"
-}
-
-pub fn parse_test() {
-  let Input(left: left, right: right) = day01.parse_input(example_input())
-  left
-  |> should.equal([3, 4, 2, 1, 3, 3])
-  right
-  |> should.equal([4, 3, 5, 3, 9, 3])
+pub fn example_input() -> String {
+  "3 4\n4 3\n2 5\n1 3\n3 9\n3 3"
 }
 
 pub fn part1_test() {
-  day01.parse_input(example_input())
-  |> day01.part1
+  day01.part1(example_input())
   |> should.equal(11)
 }
 
 pub fn part2_test() {
-  day01.parse_input(example_input())
-  |> day01.part2
+  day01.part2(example_input())
   |> should.equal(31)
 }

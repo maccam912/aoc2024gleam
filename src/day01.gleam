@@ -1,49 +1,53 @@
 import gleam/int
+import gleam/io
 import gleam/list
 import gleam/result
 import gleam/string
 
-pub type Input {
-  Input(left: List(Int), right: List(Int))
+pub fn part1(input: String) -> Int {
+  let #(left, right) = parse_input(input)
+  let sorted_left = list.sort(left, int.compare)
+  let sorted_right = list.sort(right, int.compare)
+  let result =
+    list.map2(sorted_left, sorted_right, fn(a, b) { int.absolute_value(a - b) })
+  list.fold(result, 0, fn(acc, x) { acc + x })
 }
 
-pub fn parse_input(input: String) -> Input {
+pub fn part2(input: String) -> Int {
+  let pairs = parse_input(input)
+  let #(left, right) = pairs
+
+  // For each number in left list, count occurrences in right list and multiply
+  list.fold(left, 0, fn(acc, num) {
+    let count = list.filter(right, fn(x) { x == num }) |> list.length
+    acc + num * count
+  })
+}
+
+fn parse_input(input: String) -> #(List(Int), List(Int)) {
   let lines =
-    input
-    |> string.trim
-    |> string.split("\n")
-    |> list.map(fn(line) {
-      let parts =
-        string.split(string.trim(line), " ")
+    string.split(input, "\n")
+    |> list.filter(fn(line) { string.length(line) > 0 })
+
+  let pairs =
+    list.map(lines, fn(line) {
+      let numbers =
+        string.split(line, " ")
         |> list.filter(fn(s) { string.length(s) > 0 })
-      let assert [left, right] = parts
-      #(
-        result.unwrap(int.parse(string.trim(left)), 0),
-        result.unwrap(int.parse(string.trim(right)), 0),
-      )
+        |> list.map(fn(s) {
+          let trimmed = string.trim(s)
+          result.unwrap(int.parse(trimmed), 0)
+        })
+      case numbers {
+        [a, b] -> #(a, b)
+        _ -> {
+          io.println("Invalid line: " <> line)
+          #(0, 0)
+        }
+      }
     })
 
-  Input(
-    left: list.map(lines, fn(pair) { pair.0 }),
-    right: list.map(lines, fn(pair) { pair.1 }),
-  )
-}
-
-pub fn part1(input: Input) -> Int {
-  let sorted_left = list.sort(input.left, int.compare)
-  let sorted_right = list.sort(input.right, int.compare)
-
-  list.zip(sorted_left, sorted_right)
-  |> list.map(fn(pair) { int.absolute_value(pair.0 - pair.1) })
-  |> int.sum
-}
-
-pub fn part2(input: Input) -> Int {
-  let count_in_right = fn(n) {
-    list.filter(input.right, fn(x) { x == n })
-    |> list.length
-  }
-
-  list.map(input.left, fn(n) { n * count_in_right(n) })
-  |> int.sum
+  let left = list.map(pairs, fn(p) { p.0 })
+  let right = list.map(pairs, fn(p) { p.1 })
+  #(left, right)
 }
