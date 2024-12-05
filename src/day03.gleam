@@ -1,27 +1,14 @@
 import gleam/int
+import gleam/io
 import gleam/list
 import gleam/option
 import gleam/regex
 import gleam/string
 
-pub fn part1(input: String) -> Int {
-  let assert Ok(mul_pattern) =
-    regex.from_string("mul\\((\\d{1,3}),(\\d{1,3})\\)")
-
-  regex.scan(mul_pattern, input)
-  |> list.map(fn(match) {
-    let assert [num1, num2] = match.submatches
-    let assert Ok(n1) = int.parse(option.unwrap(num1, "0"))
-    let assert Ok(n2) = int.parse(option.unwrap(num2, "0"))
-    n1 * n2
-  })
-  |> list.fold(0, fn(acc, x) { acc + x })
-}
-
 type Instruction {
-  Multiply(num1: Int, num2: Int, index: Int)
-  Do(index: Int)
-  Dont(index: Int)
+  Do
+  Dont
+  Mul(x: Int, y: Int)
 }
 
 fn get_match_index(input: String, match: regex.Match) -> Int {
@@ -32,84 +19,77 @@ fn get_match_index(input: String, match: regex.Match) -> Int {
   }
 }
 
-fn parse_instruction(input: String, match: regex.Match) -> Instruction {
-  let index = get_match_index(input, match)
-  case match.content {
-    "do()" -> Do(index: index)
-    "don't()" -> Dont(index: index)
-    _ -> {
-      let assert [num1, num2] = match.submatches
-      let assert Ok(n1) = int.parse(option.unwrap(num1, "0"))
-      let assert Ok(n2) = int.parse(option.unwrap(num2, "0"))
-      Multiply(num1: n1, num2: n2, index: index)
-    }
-  }
+fn parse_instructions(input: String) -> List(Instruction) {
+  let assert Ok(mul_pattern) =
+    regex.from_string("mul\\((\\d{1,3}),(\\d{1,3})\\)")
+  let assert Ok(do_pattern) = regex.from_string("do\\(\\)")
+  let assert Ok(dont_pattern) = regex.from_string("don't\\(\\)")
+
+  let instructions = []
+
+  // Find all matches for each pattern
+  let mul_matches = regex.scan(mul_pattern, input)
+  let do_matches = regex.scan(do_pattern, input)
+  let dont_matches = regex.scan(dont_pattern, input)
+
+  // Process mul matches
+  let mul_instructions =
+    list.map(mul_matches, fn(match) {
+      let assert [x_str, y_str] = match.submatches
+      let assert Ok(x) = int.parse(option.unwrap(x_str, "0"))
+      let assert Ok(y) = int.parse(option.unwrap(y_str, "0"))
+      #(get_match_index(input, match), Mul(x: x, y: y))
+    })
+
+  // Process do matches
+  let do_instructions =
+    list.map(do_matches, fn(match) { #(get_match_index(input, match), Do) })
+
+  // Process dont matches
+  let dont_instructions =
+    list.map(dont_matches, fn(match) { #(get_match_index(input, match), Dont) })
+
+  // Combine all instructions and sort by index
+  list.concat([mul_instructions, do_instructions, dont_instructions])
+  |> list.sort(fn(a, b) { int.compare(a.0, b.0) })
+  |> list.map(fn(x) { x.1 })
 }
 
-fn is_enabled(multiply: Instruction, controls: List(Instruction)) -> Bool {
-  case multiply {
-    Multiply(_, _, pos) -> {
-      let last_control =
-        controls
-        |> list.filter(fn(ctrl) {
-          case ctrl {
-            Do(ctrl_pos) | Dont(ctrl_pos) -> ctrl_pos < pos
-            _ -> False
-          }
-        })
-        |> list.sort(fn(a, b) {
-          case a, b {
-            Do(pos1), Do(pos2) | Dont(pos1), Dont(pos2) -> int.compare(pos1, pos2)
-            Do(pos1), Dont(pos2) | Dont(pos1), Do(pos2) -> int.compare(pos1, pos2)
-            _, _ -> int.compare(0, 0)
-          }
-        })
-        |> list.last()
+pub fn part1(input: String) -> Int {
+  let instructions = parse_instructions(input)
 
-      case last_control {
-        Ok(Do(_)) -> True
-        Ok(Dont(_)) -> False
-        Error(Nil) -> True
-        _ -> True
-      }
+  // Process instructions and accumulate multiplication results
+  list.fold(instructions, 0, fn(acc, instruction) {
+    case instruction {
+      Mul(x: x, y: y) -> acc + x * y
+      _ -> acc
     }
-    _ -> False
-  }
+  })
 }
 
 pub fn part2(input: String) -> Int {
-  let assert Ok(mul_pattern) =
-    regex.from_string("mul\\((\\d{1,3}),(\\d{1,3})\\)|do\\(\\)|don't\\(\\)")
+  let instructions = parse_instructions(input)
 
-  let instructions =
-    regex.scan(mul_pattern, input)
-    |> list.map(fn(match) { parse_instruction(input, match) })
-
-  let multiplications =
-    instructions
-    |> list.filter(fn(instr) {
-      case instr {
-        Multiply(_, _, _) -> True
-        _ -> False
+  // Fold through instructions keeping track of both accumulator and enabled state
+  list.fold(
+    instructions,
+    #(0, True),
+    // tuple of (accumulator, enabled)
+    fn(state, instruction) {
+      let #(acc, enabled) = state
+      case instruction {
+        // When we see a Dont, disable processing until next Do
+        Dont -> #(acc, False)
+        // When we see a Do, re-enable processing
+        Do -> #(acc, True)
+        // For Mul instructions, only add to accumulator if enabled
+        Mul(x: x, y: y) ->
+          case enabled {
+            True -> #(acc + x * y, enabled)
+            False -> #(acc, enabled)
+          }
       }
-    })
-
-  let controls =
-    instructions
-    |> list.filter(fn(instr) {
-      case instr {
-        Do(_) | Dont(_) -> True
-        _ -> False
-      }
-    })
-
-  multiplications
-  |> list.filter(fn(mul) { is_enabled(mul, controls) })
-  |> list.map(fn(mul) {
-    case mul {
-      Multiply(n1, n2, _) -> n1 * n2
-      _ -> 0
-    }
-  })
-  |> list.fold(0, fn(acc, x) { acc + x })
+    },
+  ).0
+  // Return just the accumulator from the tuple
 }

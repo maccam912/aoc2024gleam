@@ -82,3 +82,9 @@ Day2 = :day02.parse_input(Input2)
 - [x] Day 2: Red-Nosed Reports
   - [x] Part 1
   - [x] Part 2
+- [x] Day 3: The Tangled Web
+  - [x] Part 1
+  - [ ] Part 2
+
+# And here I give up...
+I didn't quite get part 2 working for day 3, but was falling behind. I had trouble figuring out how to set breakpoints and step through things.
